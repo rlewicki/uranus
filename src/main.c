@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <gb/gb.h>
 #include "sprites/character.h"
-#include "sprites/character.c"
 
 struct Sprite
 {
