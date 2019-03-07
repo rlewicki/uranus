@@ -43,11 +43,11 @@ void process_input(void)
     }
     else if(joypad() == J_UP)
     {
-        main_character.pos_y += 10;
+        main_character.pos_y -= 10;
     }
     else if(joypad() == J_DOWN)
     {
-        main_character.pos_y -= 10;
+        main_character.pos_y += 10;
     }
 }
 
