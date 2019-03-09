@@ -4,64 +4,83 @@
 
 struct Sprite
 {
-    int id;
-    int pos_x;
-    int pos_y;
+    BYTE id;
+    BYTE pos_x;
+    BYTE pos_y;
 };
 
-struct Sprite main_character;
+#define MAX_SPRITE_COUNT 40
+#define PLAYER_SPRITE_INDEX 0
 
-int sprite_index;
+struct Sprite sprites_container[MAX_SPRITE_COUNT];
+BYTE next_sprite_index;
+BYTE loop_iterator;
 
-void init_main_character(int tile_count, unsigned char* sprite_data)
+void init_sprite(BYTE tile_count, unsigned char* sprite_data)
 {
-    main_character.id = sprite_index++;
-    main_character.pos_x = 0;
-    main_character.pos_y = 0;
-    set_sprite_data(main_character.id, tile_count, sprite_data);
+    if(next_sprite_index >= MAX_SPRITE_COUNT)
+    {
+        printf("Cannot create more then 40 sprites");
+        return;
+    }
+
+    sprites_container[next_sprite_index].id = next_sprite_index;
+    sprites_container[next_sprite_index].pos_x = 50;
+    sprites_container[next_sprite_index].pos_y = 50;
+    next_sprite_index++;
+    set_sprite_data(sprites_container[next_sprite_index].id, tile_count, sprite_data);
 }
 
-void update_sprite_position(struct Sprite* sprite)
+void update_sprites(void)
 {
-    move_sprite(sprite->id, sprite->pos_x, sprite->pos_y);
+    for(loop_iterator = 0; loop_iterator < next_sprite_index; loop_iterator++)
+    {
+        move_sprite(
+            sprites_container[loop_iterator].id, 
+            sprites_container[loop_iterator].pos_x,
+            sprites_container[loop_iterator].pos_y);
+    }
 }
 
 void init_global_variables(void)
 {
-    sprite_index = 0;
+    next_sprite_index = 0;
+    loop_iterator = 0;
 }
 
 void process_input(void)
 {
     if(joypad() == J_RIGHT)
     {
-        main_character.pos_x += 10;
+        sprites_container[PLAYER_SPRITE_INDEX].pos_x += 10;
     }
     else if(joypad() == J_LEFT)
     {
-        main_character.pos_x -= 10;
+        sprites_container[PLAYER_SPRITE_INDEX].pos_x -= 10;
     }
     else if(joypad() == J_UP)
     {
-        main_character.pos_y -= 10;
+        sprites_container[PLAYER_SPRITE_INDEX].pos_y -= 10;
     }
     else if(joypad() == J_DOWN)
     {
-        main_character.pos_y += 10;
+        sprites_container[PLAYER_SPRITE_INDEX].pos_y += 10;
     }
 }
 
-int main(void)
+BYTE main(void)
 {
     init_global_variables();
-    init_main_character(1, character_sprite);
-    set_sprite_tile(main_character.id, 0);
+    // First initialized sprite is interpreted as player sprite
+    init_sprite(1, character_sprite);
+    init_sprite(1, character_sprite);
+
+    SHOW_SPRITES;
 
     while(1)
     {
         process_input();
-        update_sprite_position(&main_character);
-        SHOW_SPRITES;
+        update_sprites();
         delay(100);
     }
 
