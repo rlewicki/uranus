@@ -11,6 +11,8 @@ struct Sprite
 
 #define MAX_SPRITE_COUNT 40
 #define PLAYER_SPRITE_INDEX 0
+#define PLAYER_MOVEMENT_SPEED 1
+#define PLAYER_SPRITE sprites_container[PLAYER_SPRITE_INDEX]
 
 struct Sprite sprites_container[MAX_SPRITE_COUNT];
 BYTE next_sprite_index;
@@ -20,7 +22,7 @@ void init_sprite(BYTE tile_count, unsigned char* sprite_data)
 {
     if(next_sprite_index >= MAX_SPRITE_COUNT)
     {
-        printf("Cannot create more then 40 sprites");
+        // Some kind of error should be displayed here
         return;
     }
 
@@ -50,21 +52,21 @@ void init_global_variables(void)
 
 void process_input(void)
 {
-    if(joypad() == J_RIGHT)
+    if(joypad() & J_RIGHT)
     {
-        sprites_container[PLAYER_SPRITE_INDEX].pos_x += 10;
+        PLAYER_SPRITE.pos_x += PLAYER_MOVEMENT_SPEED;
     }
-    else if(joypad() == J_LEFT)
+    else if(joypad() & J_LEFT)
     {
-        sprites_container[PLAYER_SPRITE_INDEX].pos_x -= 10;
+        PLAYER_SPRITE.pos_x -= PLAYER_MOVEMENT_SPEED;
     }
-    else if(joypad() == J_UP)
+    else if(joypad() & J_UP)
     {
-        sprites_container[PLAYER_SPRITE_INDEX].pos_y -= 10;
+        PLAYER_SPRITE.pos_y -= PLAYER_MOVEMENT_SPEED;
     }
-    else if(joypad() == J_DOWN)
+    else if(joypad() & J_DOWN)
     {
-        sprites_container[PLAYER_SPRITE_INDEX].pos_y += 10;
+        PLAYER_SPRITE.pos_y += PLAYER_MOVEMENT_SPEED;
     }
 }
 
@@ -81,7 +83,7 @@ BYTE main(void)
     {
         process_input();
         update_sprites();
-        delay(100);
+        wait_vbl_done();
     }
 
     return 0;
