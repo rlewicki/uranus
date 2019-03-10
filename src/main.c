@@ -25,11 +25,16 @@ const BYTE START_POS_Y = 8 * 13;
 #define PLAYER_SPRITE_INDEX 0
 #define PLAYER_MOVEMENT_SPEED 1
 #define PLAYER_SPRITE sprites_container[PLAYER_SPRITE_INDEX]
+#define PLAYER_IDLE_TILE_INDEX 1
+#define ANIMATION_STEP_DURATION 5
 
 struct Sprite sprites_container[MAX_SPRITE_COUNT];
 BYTE next_sprite_index;
 BYTE loop_iterator;
 BYTE current_direction;
+BYTE animation_frame_count;
+BYTE current_direction_tile_index;
+BYTE current_animation_tile_index;
 
 void init_map(void);
 void init_player_sprite(void);
@@ -37,11 +42,12 @@ void update_sprites(void);
 void init_global_variables(void);
 void process_input(void);
 void update_player_position(void);
+void animate_player(void);
 
 void init_map(void)
 {
     set_bkg_data(0, 14, map_tiles_set);
-    set_bkg_tiles(0, 0, 20, 18, map_data);
+    set_bkg_tiles(0, 0, map_dataWidth, map_dataHeight, map_data);
 }
 
 void init_player_sprite(void)
@@ -73,6 +79,9 @@ void init_global_variables(void)
     next_sprite_index = 0;
     loop_iterator = 0;
     current_direction = 0;
+    animation_frame_count = 0;
+    current_direction_tile_index = 0;
+    current_animation_tile_index = 0;
 }
 
 void process_input(void)
@@ -115,6 +124,26 @@ void update_player_position(void)
     }
 }
 
+void animate_player(void)
+{
+    if(animation_frame_count > ANIMATION_STEP_DURATION)
+    {
+        animation_frame_count = 0;
+        if(current_animation_tile_index == current_direction_tile_index)
+        {
+            current_animation_tile_index = PLAYER_IDLE_TILE_INDEX;
+        }
+        else
+        {
+            current_animation_tile_index = current_direction_tile_index;
+        }
+        
+        set_sprite_tile(PLAYER_SPRITE_INDEX, current_animation_tile_index);
+    }
+    
+    animation_frame_count++;
+}
+
 BYTE main(void)
 {
     init_global_variables();
@@ -129,6 +158,7 @@ BYTE main(void)
     {
         process_input();
         update_player_position();
+        animate_player();
         update_sprites();
         wait_vbl_done();
     }
