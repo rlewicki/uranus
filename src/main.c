@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <gb/gb.h>
-#include "sprites/character.h"
+#include "sprites/map_tiles_set.h"
+#include "sprites/map_data.h"
+#include "sprites/pacman_tiles_set.h"
 
 struct Sprite
 {
@@ -8,6 +10,8 @@ struct Sprite
     BYTE pos_x;
     BYTE pos_y;
 };
+
+unsigned char empty_tile[] = {0x00};
 
 #define MAX_SPRITE_COUNT 40
 #define PLAYER_SPRITE_INDEX 0
@@ -18,17 +22,29 @@ struct Sprite sprites_container[MAX_SPRITE_COUNT];
 BYTE next_sprite_index;
 BYTE loop_iterator;
 
+void init_map(void);
+void init_sprite(BYTE tile_count, unsigned char* sprite_data);
+void update_sprites(void);
+void init_global_variables(void);
+void process_input(void);
+
+void init_map(void)
+{
+    set_bkg_data(0, 14, map_tiles_set);
+    set_bkg_tiles(0, 0, 20, 18, map_data);
+}
+
 void init_sprite(BYTE tile_count, unsigned char* sprite_data)
 {
     if(next_sprite_index >= MAX_SPRITE_COUNT)
     {
-        // Some kind of error should be displayed here
+        printf("40 sprites limit exceeded");
         return;
     }
 
     sprites_container[next_sprite_index].id = next_sprite_index;
-    sprites_container[next_sprite_index].pos_x = 50;
-    sprites_container[next_sprite_index].pos_y = 50;
+    sprites_container[next_sprite_index].pos_x = SCREENWIDTH / 2;
+    sprites_container[next_sprite_index].pos_y = SCREENHEIGHT / 2;
     next_sprite_index++;
     set_sprite_data(sprites_container[next_sprite_index].id, tile_count, sprite_data);
 }
@@ -73,11 +89,11 @@ void process_input(void)
 BYTE main(void)
 {
     init_global_variables();
-    // First initialized sprite is interpreted as player sprite
-    init_sprite(1, character_sprite);
-    init_sprite(1, character_sprite);
+    init_map();
 
+    SHOW_BKG;
     SHOW_SPRITES;
+    DISPLAY_ON;
 
     while(1)
     {

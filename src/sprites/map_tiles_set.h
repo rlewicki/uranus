@@ -1,6 +1,6 @@
 /*
 
- CHARACTER.H
+ MAP_TILES_SET.H
 
  Include File.
 
@@ -10,7 +10,7 @@
   Compression          : None.
   Counter              : None.
   Tile size            : 8 x 8
-  Tiles                : 0 to 0
+  Tiles                : 0 to 13
 
   Palette colors       : None.
   SGB Palette          : None.
@@ -24,8 +24,8 @@
 
 
 /* Bank of tiles. */
-#define TileLabelBank 0
+#define map_tiles_setBank 0
 /* Start of tile array. */
-extern unsigned char character_sprite[];
+extern unsigned char map_tiles_set[];
 
-/* End of CHARACTER.H */
+/* End of MAP_TILES_SET.H */
