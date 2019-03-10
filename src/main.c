@@ -11,15 +11,16 @@ struct Sprite
     BYTE pos_y;
 };
 
-unsigned char empty_tile[] = {0x00};
+const unsigned char empty_tile[] = {0x00};
 
 const BYTE START_POS_X = 8 * 10;
 const BYTE START_POS_Y = 8 * 13;
 
-#define DIR_LEFT 0x01U
-#define DIR_RIGHT 0x02U
-#define DIR_BOTTOM 0x04U
-#define DIR_TOP 0x08U
+#define DIR_NONE 0x00
+#define DIR_LEFT 0x01
+#define DIR_RIGHT 0x02
+#define DIR_BOTTOM 0x04
+#define DIR_TOP 0x08
 
 #define MAX_SPRITE_COUNT 40
 #define PLAYER_SPRITE_INDEX 0
@@ -47,6 +48,7 @@ void init_global_variables(void);
 void process_input(void);
 void update_player_position(void);
 void animate_player(void);
+BYTE check_for_collision(BYTE potential_pos_x, BYTE potential_pos_y);
 
 void init_map(void)
 {
@@ -116,19 +118,31 @@ void update_player_position(void)
 {
     if(current_direction & DIR_RIGHT)
     {
-        PLAYER_SPRITE.pos_x += PLAYER_MOVEMENT_SPEED;
+        if(check_for_collision(PLAYER_SPRITE.pos_x + PLAYER_MOVEMENT_SPEED, PLAYER_SPRITE.pos_y) != 1)
+        {
+            PLAYER_SPRITE.pos_x += PLAYER_MOVEMENT_SPEED;
+        }
     }
     else if(current_direction & DIR_LEFT)
     {
-        PLAYER_SPRITE.pos_x -= PLAYER_MOVEMENT_SPEED;
+        if(check_for_collision(PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED, PLAYER_SPRITE.pos_y) != 1)
+        {
+            PLAYER_SPRITE.pos_x -= PLAYER_MOVEMENT_SPEED;
+        }
     }
     else if(current_direction & DIR_TOP)
     {
-        PLAYER_SPRITE.pos_y -= PLAYER_MOVEMENT_SPEED;
+        if(check_for_collision(PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED) != 1)
+        {
+            PLAYER_SPRITE.pos_y -= PLAYER_MOVEMENT_SPEED;
+        }
     }
     else if(current_direction & DIR_BOTTOM)
     {
-        PLAYER_SPRITE.pos_y += PLAYER_MOVEMENT_SPEED;
+        if(check_for_collision(PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y + PLAYER_MOVEMENT_SPEED) != 1)
+        {
+            PLAYER_SPRITE.pos_y += PLAYER_MOVEMENT_SPEED;
+        }
     }
 }
 
@@ -150,6 +164,22 @@ void animate_player(void)
     }
 
     animation_frame_count++;
+}
+
+BYTE check_for_collision(BYTE potential_pos_x, BYTE potential_pos_y)
+{
+    UINT16 horizontal_tile = (potential_pos_x - 8) / 8;
+    UINT16 vertical_tile = (potential_pos_y - 16) / 8;
+    UINT16 tile_index = vertical_tile * map_dataWidth + horizontal_tile;
+
+    if(map_data[tile_index] != 0x00 && map_data[tile_index] != 0x03)
+    {
+        current_direction = DIR_NONE;
+        current_direction_tile_index = PLAYER_IDLE_TILE_INDEX;
+        return 1;
+    }
+    
+    return 0;
 }
 
 BYTE main(void)
