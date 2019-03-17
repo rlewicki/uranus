@@ -7,8 +7,8 @@
 struct Sprite
 {
     BYTE id;
-    BYTE pos_x;
-    BYTE pos_y;
+    INT16 pos_x;
+    INT16 pos_y;
 };
 
 const unsigned char empty_tile[] = {0x00};
@@ -112,6 +112,10 @@ void process_input(void)
         current_direction = DIR_BOTTOM;
         current_direction_tile_index = PLAYER_BOTTOM_TILE_INDEX;
     }
+    else if(joypad() &  J_A)
+    {
+        printf("%u %u\n", PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y);
+    }
 }
 
 void update_player_position(void)
@@ -174,7 +178,7 @@ BYTE check_for_collision(BYTE potential_pos_x, BYTE potential_pos_y)
 
     if(current_direction & DIR_RIGHT)
     {
-        horizontal_tile = potential_pos_x / 8;
+        horizontal_tile = (potential_pos_x - 1) / 8;
     }
     else
     {
@@ -183,7 +187,7 @@ BYTE check_for_collision(BYTE potential_pos_x, BYTE potential_pos_y)
     
     if(current_direction & DIR_BOTTOM)
     {
-        vertical_tile = (potential_pos_y - 8) / 8;
+        vertical_tile = (potential_pos_y - 9) / 8;
     }
     else
     {
