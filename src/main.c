@@ -94,23 +94,35 @@ void process_input(void)
 {
     if(joypad() & J_RIGHT)
     {
-        current_direction = DIR_RIGHT;
-        current_direction_tile_index = PLAYER_RIGHT_TILE_INDEX;
+        if(check_for_collision(PLAYER_SPRITE.pos_x + PLAYER_MOVEMENT_SPEED, PLAYER_SPRITE.pos_y) != 1)
+        {
+            current_direction = DIR_RIGHT;
+            current_direction_tile_index = PLAYER_RIGHT_TILE_INDEX;
+        }
     }
     else if(joypad() & J_LEFT)
     {
-        current_direction = DIR_LEFT;
-        current_direction_tile_index = PLAYER_LEFT_TILE_INDEX;
+        if(check_for_collision(PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED, PLAYER_SPRITE.pos_y) != 1)
+        {
+            current_direction = DIR_LEFT;
+            current_direction_tile_index = PLAYER_LEFT_TILE_INDEX;
+        }
     }
     else if(joypad() & J_UP)
     {
-        current_direction = DIR_TOP;
-        current_direction_tile_index = PLAYER_TOP_TILE_INDEX;
+        if(check_for_collision(PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED) != 1)
+        {
+            current_direction = DIR_TOP;
+            current_direction_tile_index = PLAYER_TOP_TILE_INDEX;
+        }
     }
     else if(joypad() & J_DOWN)
     {
-        current_direction = DIR_BOTTOM;
-        current_direction_tile_index = PLAYER_BOTTOM_TILE_INDEX;
+        if(check_for_collision(PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y + PLAYER_MOVEMENT_SPEED) != 1)
+        {
+            current_direction = DIR_BOTTOM;
+            current_direction_tile_index = PLAYER_BOTTOM_TILE_INDEX;
+        }
     }
     else if(joypad() &  J_A)
     {
@@ -126,12 +138,22 @@ void update_player_position(void)
         {
             PLAYER_SPRITE.pos_x += PLAYER_MOVEMENT_SPEED;
         }
+        else
+        {
+            current_direction = DIR_NONE;
+            current_direction_tile_index = PLAYER_IDLE_TILE_INDEX;
+        }
     }
     else if(current_direction & DIR_LEFT)
     {
         if(check_for_collision(PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED, PLAYER_SPRITE.pos_y) != 1)
         {
             PLAYER_SPRITE.pos_x -= PLAYER_MOVEMENT_SPEED;
+        }
+        else
+        {
+            current_direction = DIR_NONE;
+            current_direction_tile_index = PLAYER_IDLE_TILE_INDEX;
         }
     }
     else if(current_direction & DIR_TOP)
@@ -140,6 +162,11 @@ void update_player_position(void)
         {
             PLAYER_SPRITE.pos_y -= PLAYER_MOVEMENT_SPEED;
         }
+        else
+        {
+            current_direction = DIR_NONE;
+            current_direction_tile_index = PLAYER_IDLE_TILE_INDEX;
+        }
     }
     else if(current_direction & DIR_BOTTOM)
     {
@@ -147,6 +174,12 @@ void update_player_position(void)
         {
             PLAYER_SPRITE.pos_y += PLAYER_MOVEMENT_SPEED;
         }
+        else
+        {
+            current_direction = DIR_NONE;
+            current_direction_tile_index = PLAYER_IDLE_TILE_INDEX;
+        }
+        
     }
 }
 
@@ -198,8 +231,6 @@ BYTE check_for_collision(BYTE potential_pos_x, BYTE potential_pos_y)
 
     if(map_data[tile_index] != 0x00 && map_data[tile_index] != 0x03)
     {
-        current_direction = DIR_NONE;
-        current_direction_tile_index = PLAYER_IDLE_TILE_INDEX;
         return 1;
     }
     
