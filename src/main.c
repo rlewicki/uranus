@@ -168,9 +168,29 @@ void animate_player(void)
 
 BYTE check_for_collision(BYTE potential_pos_x, BYTE potential_pos_y)
 {
-    UINT16 horizontal_tile = (potential_pos_x - 8) / 8;
-    UINT16 vertical_tile = (potential_pos_y - 16) / 8;
-    UINT16 tile_index = vertical_tile * map_dataWidth + horizontal_tile;
+    UINT16 horizontal_tile;
+    UINT16 vertical_tile;
+    UINT16 tile_index;
+
+    if(current_direction & DIR_RIGHT)
+    {
+        horizontal_tile = potential_pos_x / 8;
+    }
+    else
+    {
+        horizontal_tile = (potential_pos_x - 8) / 8;
+    }
+    
+    if(current_direction & DIR_BOTTOM)
+    {
+        vertical_tile = (potential_pos_y - 8) / 8;
+    }
+    else
+    {
+        vertical_tile = (potential_pos_y - 16) / 8;
+    }
+    
+    tile_index = vertical_tile * map_dataWidth + horizontal_tile;
 
     if(map_data[tile_index] != 0x00 && map_data[tile_index] != 0x03)
     {
