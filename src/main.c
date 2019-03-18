@@ -13,14 +13,14 @@ struct Sprite
 
 const unsigned char empty_tile[] = {0x00};
 
-const BYTE START_POS_X = 8 * 10;
-const BYTE START_POS_Y = 8 * 13;
+const INT16 START_POS_X = 8 * 10;
+const INT16 START_POS_Y = 8 * 13;
 
-#define DIR_NONE 0x00
-#define DIR_LEFT 0x01
-#define DIR_RIGHT 0x02
-#define DIR_BOTTOM 0x04
-#define DIR_TOP 0x08
+#define DIR_NONE 0x01
+#define DIR_LEFT 0x02
+#define DIR_RIGHT 0x04
+#define DIR_BOTTOM 0x08
+#define DIR_TOP 0x10
 
 #define MAX_SPRITE_COUNT 40
 #define PLAYER_SPRITE_INDEX 0
@@ -40,6 +40,10 @@ BYTE current_direction;
 BYTE animation_frame_count;
 BYTE current_direction_tile_index;
 BYTE current_animation_tile_index;
+BYTE is_debug;
+
+INT16 potential_x;
+INT16 potential_y;
 
 void init_map(void);
 void init_player_sprite(void);
@@ -48,7 +52,7 @@ void init_global_variables(void);
 void process_input(void);
 void update_player_position(void);
 void animate_player(void);
-BYTE check_for_collision(BYTE potential_pos_x, BYTE potential_pos_y);
+BYTE check_for_collision();
 
 void init_map(void)
 {
@@ -84,17 +88,22 @@ void init_global_variables(void)
 {
     next_sprite_index = 0;
     loop_iterator = 0;
-    current_direction = 0;
+    current_direction = DIR_NONE;
     animation_frame_count = 0;
     current_direction_tile_index = 0;
     current_animation_tile_index = 0;
+    is_debug = 0;
+    potential_x = 0;
+    potential_y = 0;
 }
 
 void process_input(void)
 {
     if(joypad() & J_RIGHT)
     {
-        if(check_for_collision(PLAYER_SPRITE.pos_x + PLAYER_MOVEMENT_SPEED, PLAYER_SPRITE.pos_y) != 1)
+        potential_x = PLAYER_SPRITE.pos_x + PLAYER_MOVEMENT_SPEED;
+        potential_y = PLAYER_SPRITE.pos_y;
+        if(check_for_collision() != 1)
         {
             current_direction = DIR_RIGHT;
             current_direction_tile_index = PLAYER_RIGHT_TILE_INDEX;
@@ -102,7 +111,9 @@ void process_input(void)
     }
     else if(joypad() & J_LEFT)
     {
-        if(check_for_collision(PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED, PLAYER_SPRITE.pos_y) != 1)
+        potential_x = PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED;
+        potential_y = PLAYER_SPRITE.pos_y;
+        if(check_for_collision() != 1)
         {
             current_direction = DIR_LEFT;
             current_direction_tile_index = PLAYER_LEFT_TILE_INDEX;
@@ -110,7 +121,15 @@ void process_input(void)
     }
     else if(joypad() & J_UP)
     {
-        if(check_for_collision(PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED) != 1)
+        if(is_debug == 1)
+        {
+            printf("P POS: %u\n", PLAYER_SPRITE.pos_y);
+            printf("PP POS: %u\n", PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED);
+        }
+
+        potential_x = PLAYER_SPRITE.pos_x;
+        potential_y = PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED;
+        if(check_for_collision() != 1)
         {
             current_direction = DIR_TOP;
             current_direction_tile_index = PLAYER_TOP_TILE_INDEX;
@@ -118,7 +137,9 @@ void process_input(void)
     }
     else if(joypad() & J_DOWN)
     {
-        if(check_for_collision(PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y + PLAYER_MOVEMENT_SPEED) != 1)
+        potential_x = PLAYER_SPRITE.pos_x;
+        potential_y = PLAYER_SPRITE.pos_y + PLAYER_MOVEMENT_SPEED;
+        if(check_for_collision() != 1)
         {
             current_direction = DIR_BOTTOM;
             current_direction_tile_index = PLAYER_BOTTOM_TILE_INDEX;
@@ -126,7 +147,8 @@ void process_input(void)
     }
     else if(joypad() &  J_A)
     {
-        printf("%u %u\n", PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y);
+        // printf("%u %u\n", PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y);
+        is_debug = 1;
     }
 }
 
@@ -134,7 +156,9 @@ void update_player_position(void)
 {
     if(current_direction & DIR_RIGHT)
     {
-        if(check_for_collision(PLAYER_SPRITE.pos_x + PLAYER_MOVEMENT_SPEED, PLAYER_SPRITE.pos_y) != 1)
+        potential_x = PLAYER_SPRITE.pos_x + PLAYER_MOVEMENT_SPEED;
+        potential_y = PLAYER_SPRITE.pos_y;
+        if(check_for_collision() != 1)
         {
             PLAYER_SPRITE.pos_x += PLAYER_MOVEMENT_SPEED;
         }
@@ -146,7 +170,9 @@ void update_player_position(void)
     }
     else if(current_direction & DIR_LEFT)
     {
-        if(check_for_collision(PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED, PLAYER_SPRITE.pos_y) != 1)
+        potential_x = PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED;
+        potential_y = PLAYER_SPRITE.pos_y;
+        if(check_for_collision() != 1)
         {
             PLAYER_SPRITE.pos_x -= PLAYER_MOVEMENT_SPEED;
         }
@@ -158,7 +184,9 @@ void update_player_position(void)
     }
     else if(current_direction & DIR_TOP)
     {
-        if(check_for_collision(PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED) != 1)
+        potential_x = PLAYER_SPRITE.pos_x;
+        potential_y = PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED;
+        if(check_for_collision() != 1)
         {
             PLAYER_SPRITE.pos_y -= PLAYER_MOVEMENT_SPEED;
         }
@@ -170,7 +198,9 @@ void update_player_position(void)
     }
     else if(current_direction & DIR_BOTTOM)
     {
-        if(check_for_collision(PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y + PLAYER_MOVEMENT_SPEED) != 1)
+        potential_x = PLAYER_SPRITE.pos_x;
+        potential_y = PLAYER_SPRITE.pos_y + PLAYER_MOVEMENT_SPEED;
+        if(check_for_collision() != 1)
         {
             PLAYER_SPRITE.pos_y += PLAYER_MOVEMENT_SPEED;
         }
@@ -203,31 +233,53 @@ void animate_player(void)
     animation_frame_count++;
 }
 
-BYTE check_for_collision(BYTE potential_pos_x, BYTE potential_pos_y)
+BYTE check_for_collision()
 {
-    UINT16 horizontal_tile;
-    UINT16 vertical_tile;
-    UINT16 tile_index;
+    INT16 horizontal_tile;
+    INT16 vertical_tile;
+    INT16 tile_index;
 
-    if(current_direction & DIR_RIGHT)
+    if(is_debug == 1)
     {
-        horizontal_tile = (potential_pos_x - 1) / 8;
+        printf("%u\n", potential_y);
+    }
+
+    if(!(current_direction & DIR_LEFT) && potential_x % 8 != 0)
+    {
+        horizontal_tile = (potential_x - 1) / 8;
     }
     else
     {
-        horizontal_tile = (potential_pos_x - 8) / 8;
+        horizontal_tile = (potential_x - 8) / 8;
     }
     
-    if(current_direction & DIR_BOTTOM)
+    if(!(current_direction & DIR_TOP) && potential_y % 8 != 0)
     {
-        vertical_tile = (potential_pos_y - 9) / 8;
+        if(is_debug == 1)
+        {
+            printf("First\n");
+        }
+
+        vertical_tile = (potential_y - 9) / 8;    
     }
     else
     {
-        vertical_tile = (potential_pos_y - 16) / 8;
+        if(is_debug == 1)
+        {
+            printf("Second\n");
+        }
+        vertical_tile = (potential_y - 16) / 8;
     }
     
     tile_index = vertical_tile * map_dataWidth + horizontal_tile;
+
+    if(is_debug == 1)
+    {
+        printf("%u, %u\n", potential_x, potential_y);
+        printf("%u, %u\n", horizontal_tile, vertical_tile);
+        printf("%u\n", tile_index);
+        printf("%x\n", map_data[tile_index]);
+    }
 
     if(map_data[tile_index] != 0x00 && map_data[tile_index] != 0x03)
     {
