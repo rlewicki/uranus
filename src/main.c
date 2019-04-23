@@ -262,7 +262,6 @@ BYTE check_for_collision(void)
 
     if(is_debug == 1)
     {
-        printf("%u\n", potential_y);
     }
 
     if(!(current_direction & DIR_LEFT) && potential_x % 8 != 0)
@@ -276,31 +275,14 @@ BYTE check_for_collision(void)
     
     if(!(current_direction & DIR_TOP) && potential_y % 8 != 0)
     {
-        if(is_debug == 1)
-        {
-            printf("First\n");
-        }
-
         vertical_tile = (potential_y - 9) / 8;    
     }
     else
     {
-        if(is_debug == 1)
-        {
-            printf("Second\n");
-        }
         vertical_tile = (potential_y - 16) / 8;
     }
     
     tile_index = vertical_tile * map_dataWidth + horizontal_tile;
-
-    if(is_debug == 1)
-    {
-        printf("%u, %u\n", potential_x, potential_y);
-        printf("%u, %u\n", horizontal_tile, vertical_tile);
-        printf("%u\n", tile_index);
-        printf("%x\n", map_data[tile_index]);
-    }
 
     if(map_data[tile_index] != 0x00 && map_data[tile_index] != 0x03)
     {
