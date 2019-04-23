@@ -52,7 +52,9 @@ void init_global_variables(void);
 void process_input(void);
 void update_player_position(void);
 void animate_player(void);
-BYTE check_for_collision();
+BYTE check_for_collision(void);
+BYTE is_aligned_vertically(void);
+BYTE is_aligned_horizontally(void);
 
 void init_map(void)
 {
@@ -97,13 +99,33 @@ void init_global_variables(void)
     potential_y = 0;
 }
 
+BYTE is_aligned_vertically(void)
+{
+    if(PLAYER_SPRITE.pos_x % 8 == 0)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+BYTE is_aligned_horizontally(void)
+{
+    if(PLAYER_SPRITE.pos_y % 8 == 0)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 void process_input(void)
 {
     if(joypad() & J_RIGHT)
     {
         potential_x = PLAYER_SPRITE.pos_x + PLAYER_MOVEMENT_SPEED;
         potential_y = PLAYER_SPRITE.pos_y;
-        if(check_for_collision() != 1)
+        if(check_for_collision() != 1 && is_aligned_horizontally() == 1)
         {
             current_direction = DIR_RIGHT;
             current_direction_tile_index = PLAYER_RIGHT_TILE_INDEX;
@@ -113,7 +135,7 @@ void process_input(void)
     {
         potential_x = PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED;
         potential_y = PLAYER_SPRITE.pos_y;
-        if(check_for_collision() != 1)
+        if(check_for_collision() != 1 && is_aligned_horizontally() == 1)
         {
             current_direction = DIR_LEFT;
             current_direction_tile_index = PLAYER_LEFT_TILE_INDEX;
@@ -129,7 +151,7 @@ void process_input(void)
 
         potential_x = PLAYER_SPRITE.pos_x;
         potential_y = PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED;
-        if(check_for_collision() != 1)
+        if(check_for_collision() != 1 && is_aligned_vertically() == 1)
         {
             current_direction = DIR_TOP;
             current_direction_tile_index = PLAYER_TOP_TILE_INDEX;
@@ -139,7 +161,7 @@ void process_input(void)
     {
         potential_x = PLAYER_SPRITE.pos_x;
         potential_y = PLAYER_SPRITE.pos_y + PLAYER_MOVEMENT_SPEED;
-        if(check_for_collision() != 1)
+        if(check_for_collision() != 1 && is_aligned_vertically() == 1)
         {
             current_direction = DIR_BOTTOM;
             current_direction_tile_index = PLAYER_BOTTOM_TILE_INDEX;
@@ -147,7 +169,6 @@ void process_input(void)
     }
     else if(joypad() &  J_A)
     {
-        // printf("%u %u\n", PLAYER_SPRITE.pos_x, PLAYER_SPRITE.pos_y);
         is_debug = 1;
     }
 }
@@ -233,7 +254,7 @@ void animate_player(void)
     animation_frame_count++;
 }
 
-BYTE check_for_collision()
+BYTE check_for_collision(void)
 {
     INT16 horizontal_tile;
     INT16 vertical_tile;
