@@ -143,12 +143,6 @@ void process_input(void)
     }
     else if(joypad() & J_UP)
     {
-        if(is_debug == 1)
-        {
-            printf("P POS: %u\n", PLAYER_SPRITE.pos_y);
-            printf("PP POS: %u\n", PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED);
-        }
-
         potential_x = PLAYER_SPRITE.pos_x;
         potential_y = PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED;
         if(check_for_collision() != 1 && is_aligned_vertically() == 1)
