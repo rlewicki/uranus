@@ -37,6 +37,7 @@ struct Sprite sprites_container[MAX_SPRITE_COUNT];
 BYTE next_sprite_index;
 BYTE loop_iterator;
 BYTE current_direction;
+BYTE potential_direction;
 BYTE animation_frame_count;
 BYTE current_direction_tile_index;
 BYTE current_animation_tile_index;
@@ -125,6 +126,7 @@ void process_input(void)
     {
         potential_x = PLAYER_SPRITE.pos_x + PLAYER_MOVEMENT_SPEED;
         potential_y = PLAYER_SPRITE.pos_y;
+        potential_direction = DIR_RIGHT;
         if(check_for_collision() != 1 && is_aligned_horizontally() == 1)
         {
             current_direction = DIR_RIGHT;
@@ -135,6 +137,7 @@ void process_input(void)
     {
         potential_x = PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED;
         potential_y = PLAYER_SPRITE.pos_y;
+        potential_direction = DIR_LEFT;
         if(check_for_collision() != 1 && is_aligned_horizontally() == 1)
         {
             current_direction = DIR_LEFT;
@@ -145,6 +148,7 @@ void process_input(void)
     {
         potential_x = PLAYER_SPRITE.pos_x;
         potential_y = PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED;
+        potential_direction = DIR_TOP;
         if(check_for_collision() != 1 && is_aligned_vertically() == 1)
         {
             current_direction = DIR_TOP;
@@ -155,6 +159,7 @@ void process_input(void)
     {
         potential_x = PLAYER_SPRITE.pos_x;
         potential_y = PLAYER_SPRITE.pos_y + PLAYER_MOVEMENT_SPEED;
+        potential_direction = DIR_BOTTOM;
         if(check_for_collision() != 1 && is_aligned_vertically() == 1)
         {
             current_direction = DIR_BOTTOM;
@@ -173,6 +178,7 @@ void update_player_position(void)
     {
         potential_x = PLAYER_SPRITE.pos_x + PLAYER_MOVEMENT_SPEED;
         potential_y = PLAYER_SPRITE.pos_y;
+        potential_direction = current_direction;
         if(check_for_collision() != 1)
         {
             PLAYER_SPRITE.pos_x += PLAYER_MOVEMENT_SPEED;
@@ -187,6 +193,7 @@ void update_player_position(void)
     {
         potential_x = PLAYER_SPRITE.pos_x - PLAYER_MOVEMENT_SPEED;
         potential_y = PLAYER_SPRITE.pos_y;
+        potential_direction = DIR_LEFT;
         if(check_for_collision() != 1)
         {
             PLAYER_SPRITE.pos_x -= PLAYER_MOVEMENT_SPEED;
@@ -201,6 +208,7 @@ void update_player_position(void)
     {
         potential_x = PLAYER_SPRITE.pos_x;
         potential_y = PLAYER_SPRITE.pos_y - PLAYER_MOVEMENT_SPEED;
+        potential_direction = DIR_TOP;
         if(check_for_collision() != 1)
         {
             PLAYER_SPRITE.pos_y -= PLAYER_MOVEMENT_SPEED;
@@ -215,6 +223,7 @@ void update_player_position(void)
     {
         potential_x = PLAYER_SPRITE.pos_x;
         potential_y = PLAYER_SPRITE.pos_y + PLAYER_MOVEMENT_SPEED;
+        potential_direction = DIR_BOTTOM;
         if(check_for_collision() != 1)
         {
             PLAYER_SPRITE.pos_y += PLAYER_MOVEMENT_SPEED;
@@ -254,11 +263,7 @@ BYTE check_for_collision(void)
     INT16 vertical_tile;
     INT16 tile_index;
 
-    if(is_debug == 1)
-    {
-    }
-
-    if(!(current_direction & DIR_LEFT) && potential_x % 8 != 0)
+    if(!(potential_direction & DIR_LEFT) && potential_x % 8 != 0)
     {
         horizontal_tile = (potential_x - 1) / 8;
     }
@@ -267,7 +272,7 @@ BYTE check_for_collision(void)
         horizontal_tile = (potential_x - 8) / 8;
     }
     
-    if(!(current_direction & DIR_TOP) && potential_y % 8 != 0)
+    if(!(potential_direction & DIR_TOP) && potential_y % 8 != 0)
     {
         vertical_tile = (potential_y - 9) / 8;    
     }
