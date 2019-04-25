@@ -45,6 +45,9 @@ BYTE is_debug;
 
 INT16 potential_x;
 INT16 potential_y;
+INT16 current_tile_index;
+INT16 current_horizontal_tile;
+INT16 current_vertical_tile;
 
 void init_map(void);
 void init_player_sprite(void);
@@ -98,6 +101,9 @@ void init_global_variables(void)
     is_debug = 0;
     potential_x = 0;
     potential_y = 0;
+    current_tile_index = 0;
+    current_horizontal_tile = 0;
+    current_vertical_tile = 0;
 }
 
 BYTE is_aligned_vertically(void)
@@ -233,7 +239,11 @@ void update_player_position(void)
             current_direction = DIR_NONE;
             current_direction_tile_index = PLAYER_IDLE_TILE_INDEX;
         }
-        
+    }
+    
+    if(map_data[current_tile_index] == 0x03)
+    {
+        set_bkg_tiles(current_horizontal_tile, current_vertical_tile, 1, 1, 0x00);
     }
 }
 
@@ -259,31 +269,27 @@ void animate_player(void)
 
 BYTE check_for_collision(void)
 {
-    INT16 horizontal_tile;
-    INT16 vertical_tile;
-    INT16 tile_index;
-
     if(!(potential_direction & DIR_LEFT) && potential_x % 8 != 0)
     {
-        horizontal_tile = (potential_x - 1) / 8;
+        current_horizontal_tile = (potential_x - 1) / 8;
     }
     else
     {
-        horizontal_tile = (potential_x - 8) / 8;
+        current_horizontal_tile = (potential_x - 8) / 8;
     }
     
     if(!(potential_direction & DIR_TOP) && potential_y % 8 != 0)
     {
-        vertical_tile = (potential_y - 9) / 8;    
+        current_vertical_tile = (potential_y - 9) / 8;    
     }
     else
     {
-        vertical_tile = (potential_y - 16) / 8;
+        current_vertical_tile = (potential_y - 16) / 8;
     }
     
-    tile_index = vertical_tile * map_dataWidth + horizontal_tile;
+    current_tile_index = current_vertical_tile * map_dataWidth + current_horizontal_tile;
 
-    if(map_data[tile_index] != 0x00 && map_data[tile_index] != 0x03)
+    if(map_data[current_tile_index] != 0x00 && map_data[current_tile_index] != 0x03)
     {
         return 1;
     }
