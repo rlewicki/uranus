@@ -1,7 +1,7 @@
-workspace "uranus-gba"
+workspace "uranus"
     configurations { "Debug", "Release"}
 
-project "uranus-gba"
+project "uranus"
    kind "GameBoyApp"
    language "C"
    targetdir "bin/%{cfg.buildcfg}"
