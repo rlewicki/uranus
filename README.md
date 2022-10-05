@@ -18,3 +18,6 @@ and then in root directory call
 make
 ```
 
+# Showcase
+
+![gameplay-gif](gb-pacman.gif)
